@@ -1,0 +1,39 @@
+# Exclure les fichiers inutiles pour le build Docker
+
+# Répertoires Maven
+target/
+.mvn/
+
+# Fichiers IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Fichiers temporaires
+*.tmp
+*.temp
+*~
+
+# Fichiers de test
+src/test/
+
+# Documentation
+README.md
+*.md
+
+# Configuration locale
+.env
+.env.local

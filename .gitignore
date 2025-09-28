@@ -1,0 +1,62 @@
+# Maven
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+.mvn/
+mvnw
+mvnw.cmd
+
+# IDE
+.idea/
+.vscode/
+*.iws
+*.iml
+*.ipr
+.project
+.classpath
+.settings/
+
+# Système
+.DS_Store
+Thumbs.db
+*~
+.tmp/
+
+# Logs
+*.log
+logs/
+
+# Docker
+.docker/
+
+# Base de données locale
+*.db
+*.sqlite
+
+# Variables d'environnement
+.env
+.env.local
+.env.*.local
+
+# Tests
+coverage/
+test-results/
+
+# Node.js (si ajouté plus tard)
+node_modules/
+npm-debug.log*
+
+# Fichiers temporaires
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
