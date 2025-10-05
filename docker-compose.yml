@@ -1,46 +1,39 @@
 services:
-  # Base de données PostgreSQL
   postgres:
-    image: postgres:18-alpine
-    container_name: glop-moveit-postgres
+    image: postgres:15
+    container_name: moveit-postgres
     environment:
-      POSTGRES_DB: glop_moveit_db
-      POSTGRES_USER: glop_user
-      POSTGRES_PASSWORD: glop_password
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init-scripts:/docker-entrypoint-initdb.d
+      POSTGRES_DB: moveit_auth
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
-      - glop-network
+      - moveit-network
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U glop_user -d glop_moveit_db"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d moveit_auth"]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 30s
+      retries: 5
 
-  # Application Spring Boot
-  api:
-    build: 
-      context: .
-      dockerfile: ./glop-moveit-api/Dockerfile
-    container_name: glop-moveit-api
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: glop_moveit_db
-      DB_USERNAME: glop_user
-      DB_PASSWORD: glop_password
+  auth-service:
+    build:
+      context: ./services/auth-service
+    container_name: moveit-auth
     ports:
       - "8080:8080"
-    networks:
-      - glop-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/moveit_auth
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - moveit-network
     restart: unless-stopped
 
 volumes:
@@ -48,5 +41,5 @@ volumes:
     driver: local
 
 networks:
-  glop-network:
+  moveit-network:
     driver: bridge
