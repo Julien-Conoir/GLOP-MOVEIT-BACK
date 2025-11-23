@@ -1,9 +1,6 @@
 package com.moveit.notification.controller;
 
-import com.moveit.notification.dto.MarkAsReadRequest;
-import com.moveit.notification.dto.NotificationListResponse;
-import com.moveit.notification.dto.NotificationRequest;
-import com.moveit.notification.dto.NotificationResponse;
+import com.moveit.notification.dto.*;
 import com.moveit.notification.service.NotificationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -83,10 +80,11 @@ public class NotificationController {
     @PatchMapping("/{id}/read")
     public ResponseEntity<NotificationResponse> markAsRead(
             @PathVariable Long id,
+            @RequestHeader("X-User-Id") Long userId,
             @Valid @RequestBody MarkAsReadRequest request
     ) {
-        log.info("PATCH /api/notifications/{}/read - Marking as read={}", id, request.getRead());
-        NotificationResponse response = notificationService.markAsRead(id, request.getRead());
+        log.info("PATCH /api/notifications/{}/read - Marking as read={} for user {}", id, request.getRead(), userId);
+        NotificationResponse response = notificationService.markAsRead(id, userId, request.getRead());
         return ResponseEntity.ok(response);
     }
 
@@ -117,5 +115,24 @@ public class NotificationController {
         log.debug("GET /api/notifications/unread-count for user {}", userId);
         long count = notificationService.countUnreadNotifications(userId);
         return ResponseEntity.ok(count);
+    }
+
+    /**
+     * Envoyer une notification à plusieurs utilisateurs (Admin uniquement).
+     * Supporte envoi ciblé, broadcast via subscriptions, ou broadcast global.
+     *
+     * POST /api/notifications/send
+     * 
+     * Sécurité: La méthode sendBroadcast est protégée par @PreAuthorize("hasRole('ADMIN')")
+     */
+    @PostMapping("/send")
+    public ResponseEntity<NotificationResponse> sendNotification(
+            @Valid @RequestBody BroadcastNotificationRequest request
+    ) {
+        log.info("POST /api/notifications/send - Broadcasting notification type:{}, level:{}",
+                request.getType(), request.getLevelName());
+        
+        NotificationResponse response = notificationService.sendBroadcast(request);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 }
