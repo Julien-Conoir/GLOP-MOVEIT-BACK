@@ -1,23 +1,26 @@
 package com.moveit.notification.dto;
 
 import com.moveit.notification.entity.Notification;
+import com.moveit.notification.entity.NotificationRecipient;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
  * Mapper pour convertir entre entités et DTOs.
+ * Utilise le nouveau modèle notification+recipient.
  */
 @Component
 public class NotificationMapper {
 
     /**
-     * Convertit une entité Notification en NotificationResponse.
+     * Convertit un NotificationRecipient (nouveau modèle) en NotificationResponse.
      */
-    public NotificationResponse toResponse(Notification notification) {
+    public NotificationResponse toResponse(NotificationRecipient recipient) {
+        Notification notification = recipient.getNotification();
         return NotificationResponse.builder()
-                .id(notification.getId())
-                .userId(notification.getUserId())
+                .id(recipient.getId())
+                .userId(recipient.getUserId())
                 .type(notification.getType())
                 .typeName(notification.getType().name())
                 .typeDescription(notification.getType().getDescriptionKey())
@@ -27,23 +30,23 @@ public class NotificationMapper {
                 .body(notification.getBody())
                 .securityId(notification.getSecurityId())
                 .competitionId(notification.getCompetitionId())
-                .read(notification.getRead())
-                .createdAt(notification.getStartDate())
+                .read(recipient.getRead())
+                .createdAt(recipient.getCreatedAt())
                 .mandatory(notification.getType().isMandatory())
                 .build();
     }
 
     /**
-     * Convertit une liste d'entités en NotificationListResponse.
+     * Convertit une liste de NotificationRecipients en NotificationListResponse.
      */
-    public NotificationListResponse toListResponse(List<Notification> notifications, long unreadCount, boolean hasMore) {
+    public NotificationListResponse toListResponse(List<NotificationRecipient> recipients, long unreadCount, boolean hasMore) {
         return NotificationListResponse.builder()
-                .notifications(notifications.stream()
+                .notifications(recipients.stream()
                         .map(this::toResponse)
                         .toList())
                 .unreadCount(unreadCount)
                 .hasMore(hasMore)
-                .lastNotificationId(notifications.isEmpty() ? null : notifications.get(notifications.size() - 1).getId())
+                .lastNotificationId(recipients.isEmpty() ? null : recipients.get(recipients.size() - 1).getId())
                 .build();
     }
 }
