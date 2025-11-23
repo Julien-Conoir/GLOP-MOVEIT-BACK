@@ -38,19 +38,20 @@ public class NotificationController {
     }
 
     /**
-     * Récupère les notifications d'un utilisateur avec scroll infini.
+     * Récupère les notifications de l'utilisateur connecté avec scroll infini.
+     * Le userId est extrait du JWT par la Gateway et passé via header X-User-Id.
      *
-     * GET /api/notifications/user/{userId}?levelName=CRITIQUE&read=false&limit=20&afterId=123
+     * GET /api/notifications?levelName=CRITIQUE&read=false&limit=20&afterId=123
      */
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<NotificationListResponse> getUserNotifications(
-            @PathVariable Long userId,
+    @GetMapping
+    public ResponseEntity<NotificationListResponse> getMyNotifications(
+            @RequestHeader("X-User-Id") Long userId,
             @RequestParam(required = false) String levelName,
             @RequestParam(required = false) Boolean read,
             @RequestParam(defaultValue = "20") int limit,
             @RequestParam(required = false) Long afterId
     ) {
-        log.info("GET /api/notifications/user/{} - Fetching notifications (levelName={}, read={}, limit={}, afterId={})",
+        log.info("GET /api/notifications - Fetching notifications for user {} (levelName={}, read={}, limit={}, afterId={})",
                 userId, levelName, read, limit, afterId);
 
         NotificationListResponse response = notificationService.getUserNotifications(
@@ -61,13 +62,15 @@ public class NotificationController {
     }
 
     /**
-     * Récupère les notifications critiques non lues d'un utilisateur.
+     * Récupère les notifications critiques non lues de l'utilisateur connecté.
      *
-     * GET /api/notifications/user/{userId}/critical-alerts
+     * GET /api/notifications/critical-alerts
      */
-    @GetMapping("/user/{userId}/critical-alerts")
-    public ResponseEntity<List<NotificationResponse>> getCriticalAlerts(@PathVariable Long userId) {
-        log.info("GET /api/notifications/user/{}/critical-alerts - Fetching critical alerts", userId);
+    @GetMapping("/critical-alerts")
+    public ResponseEntity<List<NotificationResponse>> getMyCriticalAlerts(
+            @RequestHeader("X-User-Id") Long userId
+    ) {
+        log.info("GET /api/notifications/critical-alerts - Fetching critical alerts for user {}", userId);
         List<NotificationResponse> alerts = notificationService.getCriticalAlerts(userId);
         return ResponseEntity.ok(alerts);
     }
@@ -88,26 +91,30 @@ public class NotificationController {
     }
 
     /**
-     * Marque toutes les notifications d'un utilisateur comme lues.
+     * Marque toutes les notifications de l'utilisateur connecté comme lues.
      *
-     * POST /api/notifications/user/{userId}/mark-all-read
+     * POST /api/notifications/mark-all-read
      */
-    @PostMapping("/user/{userId}/mark-all-read")
-    public ResponseEntity<Void> markAllAsRead(@PathVariable Long userId) {
-        log.info("POST /api/notifications/user/{}/mark-all-read - Marking all as read", userId);
+    @PostMapping("/mark-all-read")
+    public ResponseEntity<Void> markAllAsRead(
+            @RequestHeader("X-User-Id") Long userId
+    ) {
+        log.info("POST /api/notifications/mark-all-read - Marking all as read for user {}", userId);
         int count = notificationService.markAllAsRead(userId);
         log.info("{} notifications marked as read for user {}", count, userId);
         return ResponseEntity.noContent().build();
     }
 
     /**
-     * Compte les notifications non lues d'un utilisateur (pour le badge).
+     * Compte les notifications non lues de l'utilisateur connecté (pour le badge).
      *
-     * GET /api/notifications/user/{userId}/unread-count
+     * GET /api/notifications/unread-count
      */
-    @GetMapping("/user/{userId}/unread-count")
-    public ResponseEntity<Long> getUnreadCount(@PathVariable Long userId) {
-        log.debug("GET /api/notifications/user/{}/unread-count", userId);
+    @GetMapping("/unread-count")
+    public ResponseEntity<Long> getUnreadCount(
+            @RequestHeader("X-User-Id") Long userId
+    ) {
+        log.debug("GET /api/notifications/unread-count for user {}", userId);
         long count = notificationService.countUnreadNotifications(userId);
         return ResponseEntity.ok(count);
     }
