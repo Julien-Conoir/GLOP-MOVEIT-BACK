@@ -1,10 +1,7 @@
 package com.moveit.notification.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moveit.notification.dto.MarkAsReadRequest;
-import com.moveit.notification.dto.NotificationListResponse;
-import com.moveit.notification.dto.NotificationRequest;
-import com.moveit.notification.dto.NotificationResponse;
+import com.moveit.notification.dto.*;
 import com.moveit.notification.entity.NotificationType;
 import com.moveit.notification.service.NotificationService;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,17 +11,20 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * Tests pour NotificationController avec le nouveau modèle.
+ */
 @WebMvcTest(NotificationController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class NotificationControllerTest {
@@ -120,7 +120,7 @@ class NotificationControllerTest {
     }
 
     @Test
-    void markAsRead_shouldUpdateNotificationStatus() throws Exception {
+    void markAsRead_shouldUpdateRecipientStatus() throws Exception {
         // Given
         MarkAsReadRequest request = new MarkAsReadRequest(true);
         NotificationResponse updatedResponse = NotificationResponse.builder()
@@ -129,10 +129,11 @@ class NotificationControllerTest {
                 .read(true)
                 .build();
 
-        when(notificationService.markAsRead(1L, true)).thenReturn(updatedResponse);
+        when(notificationService.markAsRead(1L, 123L, true)).thenReturn(updatedResponse);
 
         // When & Then
         mockMvc.perform(patch("/api/notifications/1/read")
+                        .header("X-User-Id", "123")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -175,4 +176,57 @@ class NotificationControllerTest {
                         .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    void sendBroadcast_shouldCreateBroadcastNotification() throws Exception {
+        // Given
+        BroadcastNotificationRequest broadcastRequest = new BroadcastNotificationRequest();
+        broadcastRequest.setType(NotificationType.EMERGENCY_ALERT);
+        broadcastRequest.setLevelName("CRITIQUE");
+        broadcastRequest.setName("Emergency");
+        broadcastRequest.setBody("Evacuate now");
+        broadcastRequest.setTargetUserIds(Set.of(100L, 200L, 300L));
+
+        // When & Then
+        mockMvc.perform(post("/api/notifications/send")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(broadcastRequest)))
+                .andExpect(status().isAccepted());
+    }
+
+    @Test
+    void sendBroadcast_shouldAcceptSubscriptionBasedBroadcast() throws Exception {
+        // Given
+        BroadcastNotificationRequest broadcastRequest = new BroadcastNotificationRequest();
+        broadcastRequest.setType(NotificationType.SECURITY_INCIDENT);
+        broadcastRequest.setLevelName("CRITIQUE");
+        broadcastRequest.setName("Security Alert");
+        broadcastRequest.setBody("Check your surroundings");
+        broadcastRequest.setTopic("SECURITY");
+        // Pas de targetUserIds = utilise les subscriptions
+
+        // When & Then
+        mockMvc.perform(post("/api/notifications/send")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(broadcastRequest)))
+                .andExpect(status().isAccepted());
+    }
+
+    @Test
+    void sendBroadcast_shouldAcceptGlobalBroadcast() throws Exception {
+        // Given
+        BroadcastNotificationRequest broadcastRequest = new BroadcastNotificationRequest();
+        broadcastRequest.setType(NotificationType.GENERAL_INFO);
+        broadcastRequest.setLevelName("ORGANISATIONNEL");
+        broadcastRequest.setName("General Announcement");
+        broadcastRequest.setBody("Event starting soon");
+        broadcastRequest.setBroadcast(true); // Broadcast à tous
+
+        // When & Then
+        mockMvc.perform(post("/api/notifications/send")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(broadcastRequest)))
+                .andExpect(status().isAccepted());
+    }
 }
+
