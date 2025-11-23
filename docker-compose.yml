@@ -3,18 +3,18 @@ services:
     image: postgres:15
     container_name: moveit-postgres
     environment:
-      POSTGRES_DB: moveit_auth
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql
     networks:
       - moveit-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d moveit_auth"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -29,6 +29,25 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/moveit_auth
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - moveit-network
+    restart: unless-stopped
+
+  notification-service:
+    build:
+      context: ./services/notification
+    container_name: moveit-notification
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/moveit_notification
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password
+      APP_JWTSECRET: bW92ZWl0U2VjcmV0S2V5Rm9ySlNPTldlYlRva2VuU2lnbmluZ0FuZEF1dGhlbnRpY2F0aW9u
+      APP_JWTEXPIRATIONMS: 86400000
     depends_on:
       postgres:
         condition: service_healthy
