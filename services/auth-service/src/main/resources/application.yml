@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/moveit_auth
+    username: postgres
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  docker:
+    compose:
+      enabled: true
+      lifecycle-management: start_and_stop
+
+server:
+  port: 8080
+
+security:
+  jwt:
+    secret-key: bW92ZWl0U2VjcmV0S2V5Rm9ySlNPTldlYlRva2VuU2lnbmluZ0FuZEF1dGhlbnRpY2F0aW9u
+    expiration-time: 86400000
+
