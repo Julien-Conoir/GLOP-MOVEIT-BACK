@@ -65,23 +65,6 @@ class NotificationControllerTest {
     }
 
     @Test
-    void createNotification_shouldReturnCreatedNotification() throws Exception {
-        // Given
-        when(notificationService.createNotification(any(NotificationRequest.class)))
-                .thenReturn(notificationResponse);
-
-        // When & Then
-        mockMvc.perform(post("/api/notifications")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(notificationRequest)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.userId").value(123))
-                .andExpect(jsonPath("$.type").value("SECURITY_INCIDENT"))
-                .andExpect(jsonPath("$.levelName").value("CRITIQUE"));
-    }
-
-    @Test
     void getMyNotifications_shouldReturnNotificationList() throws Exception {
         // Given
         NotificationListResponse listResponse = NotificationListResponse.builder()
@@ -162,19 +145,6 @@ class NotificationControllerTest {
                         .header("X-User-Id", "123"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("10"));
-    }
-
-    @Test
-    void createNotification_shouldReturnBadRequest_whenInvalidRequest() throws Exception {
-        // Given
-        NotificationRequest invalidRequest = new NotificationRequest();
-        // userId manquant
-
-        // When & Then
-        mockMvc.perform(post("/api/notifications")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest());
     }
 
     @Test

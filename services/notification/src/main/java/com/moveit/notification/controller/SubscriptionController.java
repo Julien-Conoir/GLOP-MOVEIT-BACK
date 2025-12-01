@@ -32,7 +32,6 @@ public class SubscriptionController {
             @RequestHeader("X-User-Id") Long userId,
             @Valid @RequestBody SubscribeRequest request) {
 
-        log.info("POST /api/notifications/subscriptions - User {} subscribing", userId);
         SubscriptionResponse response = subscriptionService.subscribe(userId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -45,7 +44,6 @@ public class SubscriptionController {
     public ResponseEntity<List<SubscriptionResponse>> getMySubscriptions(
             @RequestHeader("X-User-Id") Long userId) {
 
-        log.info("GET /api/notifications/subscriptions - User {}", userId);
         List<SubscriptionResponse> subscriptions = subscriptionService.getUserSubscriptions(userId);
         return ResponseEntity.ok(subscriptions);
     }
@@ -59,24 +57,11 @@ public class SubscriptionController {
             @RequestHeader("X-User-Id") Long userId,
             @PathVariable Long id) {
 
-        log.info("PATCH /api/notifications/subscriptions/{}/unsubscribe - User {}", id, userId);
         subscriptionService.unsubscribe(userId, id);
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Supprimer définitivement une subscription (hard delete).
-     * DELETE /api/notifications/subscriptions/{id}
-     */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSubscription(
-            @RequestHeader("X-User-Id") Long userId,
-            @PathVariable Long id) {
 
-        log.info("DELETE /api/notifications/subscriptions/{} - User {}", id, userId);
-        subscriptionService.deleteSubscription(userId, id);
-        return ResponseEntity.noContent().build();
-    }
 
     /**
      * Gestion des erreurs métier.

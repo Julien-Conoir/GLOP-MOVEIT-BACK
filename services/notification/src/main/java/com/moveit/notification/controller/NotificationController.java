@@ -22,17 +22,6 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    /**
-     * Crée une nouvelle notification.
-     *
-     * POST /api/notifications
-     */
-    @PostMapping
-    public ResponseEntity<NotificationResponse> createNotification(@Valid @RequestBody NotificationRequest request) {
-        log.info("POST /api/notifications - Creating notification for user {}", request.getUserId());
-        NotificationResponse response = notificationService.createNotification(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
 
     /**
      * Récupère les notifications de l'utilisateur connecté avec scroll infini.

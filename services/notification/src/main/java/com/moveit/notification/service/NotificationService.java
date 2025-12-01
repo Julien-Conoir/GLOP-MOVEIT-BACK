@@ -2,7 +2,6 @@ package com.moveit.notification.service;
 
 import com.moveit.notification.dto.BroadcastNotificationRequest;
 import com.moveit.notification.dto.NotificationListResponse;
-import com.moveit.notification.dto.NotificationRequest;
 import com.moveit.notification.dto.NotificationResponse;
 
 import java.util.List;
@@ -11,14 +10,6 @@ import java.util.List;
  * Interface du service de gestion des notifications.
  */
 public interface NotificationService {
-
-    /**
-     * Crée une nouvelle notification et l'envoie en temps réel via WebSocket.
-     *
-     * @param request Données de la notification
-     * @return La notification créée
-     */
-    NotificationResponse createNotification(NotificationRequest request);
 
     /**
      * Envoie une notification à plusieurs destinataires (Admin uniquement).

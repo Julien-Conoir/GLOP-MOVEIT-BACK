@@ -39,42 +39,6 @@ public class NotificationServiceImpl implements NotificationService {
     private static final int BATCH_SIZE = 1000; // Taille des batches pour inserts massifs
 
     @Override
-    @Transactional
-    public NotificationResponse createNotification(NotificationRequest request) {
-        log.info("Creating notification for user {} with type {}", request.getUserId(), request.getType());
-
-        // Récupération du niveau de notification
-        NotificationLevel level = notificationLevelRepository.findByName(request.getLevelName())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid level name: " + request.getLevelName()));
-
-        // Création de la notification (message)
-        Notification notification = Notification.builder()
-                .type(request.getType())
-                .level(level)
-                .name(request.getName())
-                .body(request.getBody())
-                .securityId(request.getSecurityId())
-                .competitionId(request.getCompetitionId())
-                .build();
-
-        // Sauvegarde de la notification
-        Notification savedNotification = notificationRepository.save(notification);
-
-        // Création du recipient
-        NotificationRecipient recipient = new NotificationRecipient();
-        recipient.setNotification(savedNotification);
-        recipient.setUserId(request.getUserId());
-        recipient.setRead(false);
-
-        NotificationRecipient savedRecipient = notificationRecipientRepository.save(recipient);
-
-        NotificationResponse response = notificationMapper.toResponse(savedRecipient);
-
-        log.info("Notification {} created for user {}", savedNotification.getId(), request.getUserId());
-        return response;
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public NotificationListResponse getUserNotifications(Long userId, String levelName, Boolean read, int limit, Long afterId) {
         log.debug("Fetching notifications for user {} (levelName={}, read={}, limit={}, afterId={})",

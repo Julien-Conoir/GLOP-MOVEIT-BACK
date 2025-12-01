@@ -98,38 +98,6 @@ class NotificationServiceImplTest {
     }
 
     @Test
-    void createNotification_shouldCreateNotificationAndRecipient() {
-        // Given
-        when(notificationLevelRepository.findByName("CRITIQUE")).thenReturn(Optional.of(criticalLevel));
-        when(notificationRepository.save(any(Notification.class))).thenReturn(notification);
-        when(notificationRecipientRepository.save(any(NotificationRecipient.class))).thenReturn(recipient);
-        when(notificationMapper.toResponse(recipient)).thenReturn(response);
-
-        // When
-        NotificationResponse result = notificationService.createNotification(request);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getUserId()).isEqualTo(123L);
-        assertThat(result.getType()).isEqualTo(NotificationType.SECURITY_INCIDENT);
-        verify(notificationRepository).save(any(Notification.class));
-        verify(notificationRecipientRepository).save(any(NotificationRecipient.class));
-    }
-
-    @Test
-    void createNotification_shouldThrowException_whenLevelNotFound() {
-        // Given
-        when(notificationLevelRepository.findByName("CRITIQUE")).thenReturn(Optional.empty());
-
-        // When & Then
-        assertThatThrownBy(() -> notificationService.createNotification(request))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Invalid level name");
-
-        verify(notificationRepository, never()).save(any());
-    }
-
-    @Test
     void getUserNotifications_shouldReturnNotificationList() {
         // Given
         List<NotificationRecipient> recipients = Arrays.asList(recipient);
