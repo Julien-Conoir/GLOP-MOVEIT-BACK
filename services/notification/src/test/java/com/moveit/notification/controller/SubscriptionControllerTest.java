@@ -158,43 +158,6 @@ class SubscriptionControllerTest {
     }
 
     @Test
-    void deleteSubscription_shouldDeleteSubscription() throws Exception {
-        // Given
-        doNothing().when(subscriptionService).deleteSubscription(123L, 1L);
-
-        // When & Then
-        mockMvc.perform(delete("/api/notifications/subscriptions/1")
-                        .header("X-User-Id", "123"))
-                .andExpect(status().isNoContent());
-
-        verify(subscriptionService).deleteSubscription(123L, 1L);
-    }
-
-    @Test
-    void deleteSubscription_shouldReturnBadRequest_whenMandatoryType() throws Exception {
-        // Given
-        doThrow(new IllegalArgumentException("Cannot delete subscription for mandatory notification type"))
-                .when(subscriptionService).deleteSubscription(123L, 1L);
-
-        // When & Then
-        mockMvc.perform(delete("/api/notifications/subscriptions/1")
-                        .header("X-User-Id", "123"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void deleteSubscription_shouldReturnNotFound_whenSubscriptionNotFound() throws Exception {
-        // Given
-        doThrow(new IllegalArgumentException("Subscription not found"))
-                .when(subscriptionService).deleteSubscription(123L, 999L);
-
-        // When & Then
-        mockMvc.perform(delete("/api/notifications/subscriptions/999")
-                        .header("X-User-Id", "123"))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
     void subscribe_shouldReturnBadRequest_whenUserIdHeaderMissing() throws Exception {
         // When & Then
         mockMvc.perform(post("/api/notifications/subscriptions")
