@@ -5,7 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,12 +22,20 @@ import java.io.IOException;
  * Filtre d'authentification JWT.
  */
 @Component
-@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final HandlerExceptionResolver handlerExceptionResolver;
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
+
+    public JwtAuthenticationFilter(
+            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver handlerExceptionResolver,
+            JwtService jwtService,
+            UserDetailsService userDetailsService) {
+        this.handlerExceptionResolver = handlerExceptionResolver;
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
+    }
 
     /**
      * Traite chaque requête HTTP pour l'authentification JWT.
