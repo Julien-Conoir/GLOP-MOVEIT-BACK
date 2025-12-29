@@ -26,6 +26,8 @@
         <jjwt.version>0.13.0</jjwt.version>
         <postgresql.version>42.7.8</postgresql.version>
         <lombok.version>1.18.42</lombok.version>
+        <prometheus.version>1.16.1</prometheus.version>
+        <loki.version>1.6.0</loki.version>
     </properties>
 
     <dependencyManagement>
@@ -63,6 +65,16 @@
                 <groupId>org.postgresql</groupId>
                 <artifactId>postgresql</artifactId>
                 <version>${postgresql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-registry-prometheus</artifactId>
+                <version>${prometheus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.loki4j</groupId>
+                <artifactId>loki-logback-appender</artifactId>
+                <version>${loki.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
