@@ -1,0 +1,10 @@
+target/
+README.md
+.gitignore
+.git
+mvnw.cmd
+mvnw
+.mvn/
+*.class
+*.log
+

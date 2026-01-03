@@ -1,0 +1,12 @@
+**/target/
+**/*.log
+**/*.class
+**/.mvn/
+**/mvnw
+**/mvnw.cmd
+.git
+.gitignore
+bruno/
+monitoring/
+README.md
+
