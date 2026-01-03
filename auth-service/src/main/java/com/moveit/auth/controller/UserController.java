@@ -23,7 +23,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/users")
+@RequestMapping("/auth/users")
 @Tag(name = "Utilisateurs", description = "API de gestion des utilisateurs")
 public class UserController {
 
