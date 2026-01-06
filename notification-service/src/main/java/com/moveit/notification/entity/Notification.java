@@ -39,4 +39,12 @@ public class Notification {
     @CollectionTable(name = "notification_events", joinColumns = @JoinColumn(name = "notification_id"))
     @Column(name = "event_id")
     private Set<Long> eventIds = new HashSet<>();
+
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }
