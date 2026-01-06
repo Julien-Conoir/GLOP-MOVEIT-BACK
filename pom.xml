@@ -13,6 +13,7 @@
     <modules>
         <module>auth-service</module>
         <module>gateway</module>
+        <module>championship-service</module>
     </modules>
 
     <properties>
