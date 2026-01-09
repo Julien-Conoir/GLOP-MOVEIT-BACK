@@ -69,6 +69,25 @@ services:
       retries: 5
       start_period: 60s
 
+  postgres-notification:
+    image: postgres:15
+    container_name: moveit-notification-postgres
+    environment:
+      POSTGRES_DB: moveit_notification
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-notification-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - moveit-network
+
   notification-service:
     build:
       context: .
@@ -77,8 +96,14 @@ services:
     ports:
       - "8088:8088"
     environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-notification:5432/moveit_notification
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - LOKI_URL=http://loki:3100
     depends_on:
+      postgres-notification:
+        condition: service_healthy
       loki:
         condition: service_started
     networks:
@@ -88,7 +113,7 @@ services:
       interval: 15s
       timeout: 10s
       retries: 5
-      start_period: 30s
+      start_period: 60s
 
   prometheus:
     image: prom/prometheus:latest
@@ -133,10 +158,11 @@ services:
 
 networks:
   moveit-network:
-    external: true
+    driver: bridge
 
 volumes:
   postgres-data:
+  postgres-notification-data:
   prometheus-data:
   grafana-data:
   loki-data:
