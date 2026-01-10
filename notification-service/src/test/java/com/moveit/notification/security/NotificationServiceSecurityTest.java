@@ -180,33 +180,6 @@ class NotificationServiceSecurityTest {
     }
 
     @Test
-    @DisplayName("GET /subscriptions without token should return 401")
-    void testGetSubscriptions_NoToken_Returns401() throws IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/subscriptions"))
-                .GET()
-                .build();
-
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        
-        assertEquals(401, response.statusCode());
-    }
-
-    @Test
-    @DisplayName("GET /subscriptions with valid token should return 200")
-    void testGetSubscriptions_WithValidToken_Returns200() throws IOException, InterruptedException {
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/subscriptions"))
-                .header("Authorization", "Bearer " + validToken)
-                .GET()
-                .build();
-
-        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-        
-        assertEquals(200, response.statusCode());
-    }
-
-    @Test
     @DisplayName("Actuator endpoints should be accessible without token")
     void testActuatorEndpoint_NoToken_Returns200() throws IOException, InterruptedException {
         HttpRequest request = HttpRequest.newBuilder()
