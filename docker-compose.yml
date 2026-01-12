@@ -112,7 +112,7 @@ services:
 
 networks:
   moveit-network:
-    external: true
+    driver: bridge
 
 volumes:
   postgres-data:
