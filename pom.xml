@@ -157,19 +157,6 @@
                                 <goal>check</goal>
                             </goals>
                             <configuration>
-                                <skip>true</skip>
-                                <rules>
-                                    <rule>
-                                        <element>PACKAGE</element>
-                                        <limits>
-                                            <limit>
-                                                <counter>LINE</counter>
-                                                <value>COVEREDRATIO</value>
-                                                <minimum>0.50</minimum>
-                                            </limit>
-                                        </limits>
-                                    </rule>
-                                </rules>
                             </configuration>
                         </execution>
                     </executions>
